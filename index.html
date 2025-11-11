@@ -1,0 +1,1187 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"> 
+  <title>প্রবাসী হেল্প কেয়ার - ড্যাশবোর্ড</title>
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    /* 🎨 মূল কালার প্যালেট (Trust & Simplicity Palette) */
+    :root {
+      --primary-color: #005f73;   
+      --secondary-color: #0a9396; 
+      --accent-color: #94d2bd;    
+      --bg-light: #fefefe;        
+      
+      --dark-secondary: #006d77;  
+      --dark-accent: #6fa390;     
+      --shadow-color: rgba(10, 147, 150, 0.2);
+    }
+
+    /* ⭐ ভিজিবিলিটি ফিক্স: পেজ ফিক্সড এবং স্ক্রল ম্যানেজমেন্ট ⭐ */
+    html, body {
+      height: 100%;
+      width: 100%;
+      overflow-x: hidden !important; 
+      background-color: var(--bg-light);
+      font-family: 'Arial', sans-serif;
+      padding: 0; 
+      margin: 0;
+    }
+
+    /* শুধুমাত্র প্রয়োজনীয় কন্টেন্ট স্ক্রল হবে এবং বাকি অংশ ফিক্সড থাকবে */
+    .content-wrapper {
+      /* নতুন Header এর উচ্চতা প্রায় 130px, Footer 55px. 100% - 185px */
+      height: calc(100vh - 185px); 
+      overflow-y: auto; /* কন্টেন্টের জন্য স্ক্রল চালু */
+      -webkit-overflow-scrolling: touch; 
+      padding-top: 5px; 
+      padding-bottom: 55px; 
+    }
+    
+    /* Header */
+    .header-bg {
+      background-color: var(--primary-color);
+      color: white;
+      border-bottom-left-radius: 30px;
+      border-bottom-right-radius: 30px;
+      box-shadow: 0 5px 12px rgba(0,0,0,0.3);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      padding-bottom: 0;
+      /* UTC-BAR সরিয়ে দেওয়ায় height কমেছে */
+    }
+    
+    /* UTC টাইম নতুন স্টাইল */
+    .utc-display-compact {
+        background-color: var(--secondary-color); /* নতুন ব্যাকগ্রাউন্ড কালার */
+        border-radius: 9999px;
+        padding: 3px 10px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        display: flex;
+        align-items: center;
+        margin-top: 3px; /* একটু নিচে নামানো */
+    }
+
+    .utc-display-compact .text-xs {
+      font-size: 0.7rem; 
+      opacity: 0.9;
+    }
+    .utc-display-compact .text-sm {
+      font-size: 0.8rem; 
+      font-weight: bold;
+    }
+    
+    .clock-display {
+        font-family: 'Digital', 'Consolas', monospace; 
+        letter-spacing: 0.5px;
+        color: white; 
+    }
+    
+    /* Header মেনু এবং আইকন */
+    .header-main-item {
+        padding: 5px 10px 5px 10px; 
+        display: flex;
+        justify-content: flex-end; 
+        align-items: center;
+    }
+    
+    /* সৌদি ও বাংলাদেশ টাইম সেকশন (কম্প্যাক্ট) */
+    .time-section-compact {
+        padding: 5px 10px 10px 10px; 
+        /* এখন UTC ডিসপ্লেটি মাঝখানে থাকার জন্য justify-content পরিবর্তন করা হলো */
+        display: flex;
+        justify-content: space-between; 
+        align-items: flex-end; /* সব নিচের দিকে অ্যালাইনড থাকবে */
+        position: relative; /* UTC ডিসপ্লে অ্যাবস্যালুট পজিশনের জন্য */
+    }
+    
+    /* UTC পজিশন ফিক্স */
+    .utc-absolute-position {
+        position: absolute;
+        top: 0; 
+        left: 50%;
+        transform: translateX(-50%) translateY(-50%); /* সেন্টারে পজিশন সেট */
+        z-index: 10;
+    }
+
+    .time-section-compact .text-xs {
+        font-size: 0.65rem; 
+    }
+    .time-section-compact .text-lg {
+        font-size: 1.1rem; 
+    }
+
+    /* ⭐ AM/PM স্টাইল ⭐ */
+    .ampm-display {
+        font-size: 0.7rem; /* AM/PM এর ফন্ট সাইজ */
+        font-weight: 700;
+        margin-left: 2px;
+        opacity: 0.9;
+        color: var(--accent-color); /* AM/PM এর রং */
+    }
+    
+    /* ড্যাশবোর্ড কার্ড স্টাইল (কম্প্যাক্ট) */
+    .compact-card { 
+        padding: 0; 
+        border: 2px solid #ccc !important; 
+        margin-top: 8px !important; 
+        color: #1f2937; 
+    }
+    /* ছবি অনুযায়ী স্পেশাল বর্ডার কালার */
+    #iqama-countdown-card.border-green-500 { border-color: #22c55e !important; }
+    #visa-countdown-card.border-orange-500 { border-color: #f97316 !important; }
+    
+    .card-section-compact { padding: 0.4rem 0.7rem; } 
+    .progress-bar-padded-container { padding: 0.4rem 0.7rem; }
+    
+    /* ⭐ প্রগ্রেস বার ভিজিবিলিটি ফিক্স (আগের মতো রাখা হলো) ⭐ */
+    .progress-bar-bg-rounded {
+      border-radius: 9999px; 
+    }
+
+    .progress-bar-height {
+      height: 10px; 
+      width: 100%;
+    }
+
+    .animated-progress {
+      transition: width 0.5s ease-in-out; 
+      border-radius: 9999px;
+      background-color: var(--progress-color-light, #0a9396); 
+      box-shadow: 0 2px 4px rgba(var(--progress-shadow-rgb, 10, 147, 150), 0.4);
+    }
+
+    /* ⭐ টাইম এবং কাউন্টডাউন ফিক্স: কালার কন্ট্রাস্ট এবং ভিজিবিলিটি ফিক্স ⭐ */
+    .compact-label { font-size: 0.7rem; font-weight: 500; color: #374151; }
+    .compact-data { font-size: 0.9rem; font-weight: 700; color: #1f2937 !important; } 
+    .time-label { font-size: 0.6rem; font-weight: 600; color: #4b5563; margin-right: 0.1rem; }
+    .time-data { font-size: 0.8rem; font-weight: 800; color: #1f2937 !important; } 
+    .time-data.seconds { font-size: 0.6rem; color: #9ca3af; }
+    .time-label.seconds { font-size: 0.5rem; color: #d1d5db; margin-right: 0; }
+    .compact-baki-text { font-size: 0.65rem; font-weight: 600; margin-left: 0.3rem; color: #4b5563; }
+    
+    /* ফিক্স: নির্দিষ্ট কালারগুলো ছবিতে স্পষ্ট করতে */
+    .text-green-700 { color: #15803d !important; }
+    .text-orange-700 { color: #c2410c !important; }
+
+
+    /* চিকন, স্টাইলিশ বাটন (আগের মতো রাখা হলো) */
+    .thin-stylish-button {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 0.4rem 0.8rem; 
+        font-size: 0.85rem; 
+        font-weight: 700;
+        color: #ffffff;
+        background-color: var(--secondary-color);
+        border-radius: 0.75rem; 
+        box-shadow: 0 4px 6px rgba(10, 147, 150, 0.4); 
+        transition: all 0.2s ease-in-out;
+        border: 2px solid var(--dark-secondary);
+    }
+    .thin-stylish-button:hover {
+        background-color: var(--dark-secondary);
+        transform: translateY(-1px);
+    }
+    
+    /* সার্ভিস সেকশন */
+    .service-container {
+      background-color: var(--bg-light);
+      padding: 10px 0; 
+      margin-top: 10px;
+    }
+    
+    /* ⭐ পরিবর্তিত: সার্ভিস কার্ড স্টাইল (আকর্ষণীয় ও সহজীকৃত) ⭐ */
+    .service-btn-card {
+      background-color: #ffffff;
+      border-radius: 12px; /* একটু বেশি রাউন্ডেড */
+      padding: 15px 10px 10px 10px; /* নিচের দিকে কম প্যাডিং */
+      border: 1px solid #e5e7eb; 
+      box-shadow: 0 6px 15px rgba(0,0,0,0.08); /* গভীর শ্যাডো */
+      transition: all 0.3s ease-in-out;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden; /* গ্লোর জন্য */
+    }
+    
+    /* কার্ডের বাম দিকে আকর্ষণীয় বর্ডার গ্লো ইফেক্ট */
+    .service-btn-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 5px;
+        height: 100%;
+        background-color: var(--secondary-color); 
+        box-shadow: 0 0 10px var(--secondary-color); /* গ্লো ইফেক্ট */
+        transition: all 0.3s ease-in-out;
+    }
+    
+    .service-btn-card:active {
+      transform: scale(0.98);
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      background-color: #f7f7f7; 
+    }
+    
+    .service-btn-card:hover::before {
+        background-color: var(--primary-color);
+        box-shadow: 0 0 15px var(--primary-color);
+    }
+    
+    .icon-service {
+      font-size: 32px; /* আইকনের আকার বড় করা হলো */
+      margin-bottom: 5px;
+      color: var(--secondary-color);
+      transition: color 0.3s;
+    }
+    
+    .service-btn-card:hover .icon-service {
+        color: var(--primary-color);
+    }
+
+    .service-btn-card p {
+      font-size: 0.9rem; /* টাইটেল ফন্ট বড় করা হলো */
+      font-weight: 800; /* ফন্ট ওয়েট বাড়ানো হলো */
+      color: #1f2937; /* গাড়ো রং */
+      margin-bottom: 3px;
+      text-align: center;
+      line-height: 1.2;
+    }
+    
+    /* নতুন: ট্যাগলাইন স্টাইল */
+    .service-tagline {
+        font-size: 0.65rem; /* ছোট ফন্ট */
+        font-weight: 500;
+        color: #6b7280; /* হালকা গ্রে রং */
+        text-align: center;
+        margin-top: 0;
+        margin-bottom: 5px;
+    }
+    /* ⭐ সমাপ্ত: সার্ভিস কার্ড স্টাইল ⭐ */
+
+
+    /* Urgent News */
+    .urgent-news-card {
+      border: 2px solid var(--accent-color);
+      border-radius: 12px;
+      background-color: #f4fffb;
+      padding: 10px 15px;
+      margin-top: 10px !important;
+    }
+    .urgent-news-card h6 {
+      font-size: 0.9rem;
+      margin-bottom: 0 !important;
+    }
+
+    /* সহযোগী প্রতিষ্ঠান লোগো গ্যালারি */
+    .partner-section-title {
+      display: none; 
+    }
+    
+    .partner-logo-gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(50px, 1fr)); 
+      gap: 5px; 
+      padding: 5px 0 0 0; 
+      margin-bottom: 15px;
+      justify-content: space-between; 
+      align-items: center;
+    }
+    
+    /* ছোট স্ক্রিনের জন্য কলাম সংখ্যা নিশ্চিত করা হলো */
+    @media (max-width: 375px) {
+        .partner-logo-gallery {
+            grid-template-columns: repeat(7, 1fr); 
+        }
+    }
+    @media (min-width: 376px) and (max-width: 450px) {
+        .partner-logo-gallery {
+            grid-template-columns: repeat(8, 1fr); 
+        }
+    }
+    @media (min-width: 451px) {
+        .partner-logo-gallery {
+            grid-template-columns: repeat(10, 1fr); 
+        }
+    }
+
+    .partner-logo-card {
+        background-color: #fff;
+        border-radius: 6px; 
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05); 
+        padding: 3px; 
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden;
+        height: 40px; /* লম্বায় ছোট করার জন্য ফিক্সড */
+        border: 1px solid #eee;
+        transition: transform 0.2s;
+    }
+    .partner-logo-card:active {
+        transform: scale(0.95);
+    }
+    .partner-logo-card img {
+        width: 100%;
+        height: auto;
+        max-height: 30px; /* লোগোর সর্বোচ্চ উচ্চতা ফিক্সড */
+        object-fit: contain;
+        filter: none; 
+        transition: none; 
+    }
+    .partner-logo-card:hover img {
+        filter: none;
+    }
+
+    /* Bottom Navigation */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background-color: #fff;
+      box-shadow: 0 -5px 15px rgba(0,0,0,0.1);
+      z-index: 1000;
+      padding: 5px 0;
+      height: 55px;
+    }
+    .bottom-nav a {
+      text-decoration: none;
+      color: #999;
+      font-size: 0.7rem;
+      text-align: center;
+    }
+    .bottom-nav a div {
+      margin-top: 3px;
+    }
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+
+  <div class="header-bg text-center">
+    
+    <div class="header-main-item container">
+      <div class="d-flex">
+        <a href="#" class="text-white me-3" onclick="openActivity('SettingsActivity')"><i class="fas fa-cog fa-lg"></i></a>
+        <a href="#" class="text-white" onclick="openActivity('ProfileActivity')"><i class="fas fa-user-circle fa-lg"></i></a>
+      </div>
+    </div>
+    
+    <div class="time-section-compact container">
+        
+        <div class="utc-absolute-position">
+            <div class="utc-display-compact text-white shadow-inner">
+                <div class="flex items-center space-x-2">
+                    <span class="text-xs font-semibold">✈️ এয়ারপোর্ট (UTC):</span>
+                    <div class="flex items-end space-x-0.5 clock-display">
+                        <span class="text-sm font-extrabold" id="utc-time-24h-display">--:--</span>
+                        <span class="text-xs font-bold opacity-80" id="utc-sec-display">:--</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="flex flex-col items-start">
+            <span class="text-xs font-normal opacity-75 text-white">🇸🇦 সৌদি সময়</span>
+            <div class="flex items-end space-x-0.5 clock-display">
+                <span class="text-lg font-extrabold" id="saudi-time-display">--:--</span>
+                <span class="text-xs font-bold opacity-80" id="saudi-sec-display">:--</span>
+                <span class="ampm-display text-white" id="saudi-ampm-display"></span>
+            </div>
+        </div>
+        
+        <div class="flex flex-col items-center justify-center text-center">
+            <span class="text-xs font-semibold text-white opacity-70">সময় পার্থক্য</span>
+            <span class="text-sm font-bold text-white">🇧🇩 +3</span>
+        </div>
+        
+        <div class="flex flex-col items-end">
+            <span class="text-xs font-normal opacity-75 text-white">🇧🇩 বাংলাদেশ সময়</span>
+            <div class="flex items-end space-x-0.5 clock-display">
+                <span class="text-lg font-extrabold" id="bd-time-display">--:--</span>
+                <span class="text-xs font-bold opacity-80" id="bd-sec-display">:--</span>
+                <span class="ampm-display text-white" id="bd-ampm-display"></span>
+            </div>
+        </div>
+    </div>
+  </div>
+
+  <div class="content-wrapper container">
+
+    <main class="max-w-xl mx-auto p-0">
+
+        <div id="set-iqama-button-container" class="mt-2.5">
+            <button id="show-iqama-modal-btn" class="thin-stylish-button">
+                🗓️ ইকামার মেয়াদ সেট করুন
+            </button>
+        </div>
+
+        <div id="iqama-countdown-card" class="bg-white rounded-xl shadow-lg transition duration-500 ease-in-out compact-card border-gray-300 hidden">
+            
+            <div class="card-section-compact border-b border-gray-100 flex justify-between items-center">
+                <p class="compact-label text-gray-800 flex items-center">🗓️ ইকামার মেয়াদ শেষ</p>
+                <button id="set-iqama-btn" class="text-xs text-gray-500 font-semibold py-0.5 px-2 rounded-lg hover:bg-gray-100 transition duration-300 whitespace-nowrap">
+                    সেট করুন / --/--/----
+                </button>
+            </div>
+
+            <div id="iqama-progress-container" class="hidden progress-bar-padded-container">
+                <div class="progress-bar-height bg-gray-200 overflow-hidden progress-bar-bg-rounded">
+                    <div id="iqama-progress-bar" class="h-full animated-progress" style="width: 0%;"></div>
+                </div>
+            </div>
+            
+            <div class="card-section-compact flex justify-between items-center text-sm">
+                <div class="flex items-center space-x-1">
+                    <span id="iqama-status-dot" class="w-2 h-2 rounded-full bg-gray-500"></span>
+                    <span id="iqama-status-text" class="compact-label font-bold text-gray-700">সেট করা নেই</span>
+                </div>
+                
+                <div id="iqama-countdown-display" class="font-extrabold text-gray-800 text-right space-x-0.5">
+                    <span class="compact-data text-gray-500">-- দিন -- ঘণ্টা বাকি আছে</span>
+                </div>
+            </div>
+
+        </div>
+        
+        <div id="set-visa-button-container" class="mt-2.5">
+            <button id="show-visa-modal-btn" class="thin-stylish-button">
+                ✈️ ছুটির মেয়াদ সেট করুন
+            </button>
+        </div>
+
+        <div id="visa-countdown-card" class="bg-white rounded-xl shadow-lg transition duration-500 ease-in-out compact-card border-orange-500 hidden">
+            
+            <div class="card-section-compact border-b border-gray-100 flex justify-between items-center">
+                <p class="compact-label text-gray-800 flex items-center">✈️ এক্সিট/রি-এন্ট্রি মেয়াদ</p>
+                <button id="reset-visa-btn" class="text-xs text-red-500 font-semibold py-0.5 px-2 rounded-lg hover:bg-red-50 transition duration-300 whitespace-nowrap">
+                    ডিলিট করুন / --/--/----
+                </button>
+            </div>
+
+            <div id="visa-progress-container" class="hidden progress-bar-padded-container">
+                <div class="progress-bar-height bg-gray-200 overflow-hidden progress-bar-bg-rounded">
+                    <div id="visa-progress-bar" class="h-full animated-progress" style="width: 0%;"></div>
+                </div>
+            </div>
+            
+            <div class="card-section-compact flex justify-between items-center text-sm">
+                <div class="flex items-center space-x-1">
+                    <span id="visa-status-dot" class="w-2 h-2 rounded-full bg-gray-500"></span>
+                    <span id="visa-status-text" class="compact-label font-bold text-gray-700">সেট করা নেই</span>
+                </div>
+                
+                <div id="visa-countdown-display" class="font-extrabold text-gray-800 text-right space-x-0.5">
+                    <span class="compact-data text-gray-500">-- দিন -- ঘণ্টা বাকি আছে</span>
+                </div>
+            </div>
+
+        </div>
+        
+        <div class="card urgent-news-card shadow-sm">
+            <h6 class="fw-bolder">⭐ গুরুত্বপূর্ণ ঘোষণা</h6>
+            <a href="#" class="stretched-link" onclick="openActivity('GosonaActivity')"></a>
+        </div>
+
+    </main>
+
+    <h5 class="mt-3 mb-2 fw-bold text-secondary" style="font-size: 1rem;">আপনার প্রয়োজনীয় সেবাসমূহ</h5>
+    <div class="row g-3 service-container"> 
+      
+      <div class="col-6">
+        <a href="#" onclick="openActivity('ProbashiupdatenewsActivity')" class="text-decoration-none d-block">
+          <div class="service-btn-card">
+            <i class="fas fa-newspaper icon-service" style="color: var(--secondary-color);"></i>
+            <p>প্রবাসী আপডেট নিউজ</p>
+            <span class="service-tagline">বিদেশি সকল খবর ও তথ্য</span>
+          </div>
+        </a>
+      </div>
+      
+      <div class="col-6">
+        <a href="#" onclick="openActivity('ProbashiserviceActivity')" class="text-decoration-none d-block">
+          <div class="service-btn-card">
+            <i class="fas fa-briefcase icon-service" style="color: #00796b;"></i>
+            <p>প্রবাসী সার্ভিস</p>
+            <span class="service-tagline">গুরুত্বপূর্ণ সেবা ও সহায়তা</span>
+          </div>
+        </a>
+      </div>
+      
+      <div class="col-6">
+        <a href="#" onclick="openActivity('OnlineserviceActivity')" class="text-decoration-none d-block">
+          <div class="service-btn-card">
+            <i class="fas fa-globe icon-service" style="color: var(--accent-color);"></i>
+            <p>অনলাইন সার্ভিস</p>
+            <span class="service-tagline">আবেদন, তথ্য যাচাই ও পূরণ</span>
+          </div>
+        </a>
+      </div>
+      
+      <div class="col-6">
+        <a href="#" onclick="openActivity('OflineActivity')" class="text-decoration-none d-block">
+          <div class="service-btn-card">
+            <i class="fas fa-handshake icon-service" style="color: var(--primary-color);"></i>
+            <p>অফলাইন সার্ভিস</p>
+            <span class="service-tagline">প্রয়োজনে সরাসরি যোগাযোগ</span>
+          </div>
+        </a>
+      </div>
+      
+    </div>
+    
+    <div class="partner-logo-gallery mb-3"> 
+      <div class="partner-logo-card"><img src="https://i.postimg.cc/MZb4KpBb/image-search-1762555470514.jpg" alt="Partner Logo 1"></div>
+      <div class="partner-logo-card"><img src="https://i.postimg.cc/SsNH80CD/download-2.jpg" alt="Partner Logo 2"></div>
+      <div class="partner-logo-card"><img src="https://i.postimg.cc/15jR3BxT/image-search-1762550138826.jpg" alt="Partner Logo 3"></div>
+      <div class="partner-logo-card"><img src="https://i.postimg.cc/C19TVPn3/image-search-1762549838585.png" alt="Partner Logo 4"></div>
+      <div class="partner-logo-card"><img src="https://i.postimg.cc/wjqrn84S/image-search-1762549764200.jpg" alt="Partner Logo 5"></div>
+      <div class="partner-logo-card"><img src="https://i.postimg.cc/GmgXNByY/image-search-1762549892538.jpg" alt="Partner Logo 6"></div>
+      <div class="partner-logo-card"><img src="https://i.postimg.cc/wBsQGwHy/image-search-1762550117552.jpg" alt="Partner Logo 7"></div>
+      <div class="partner-logo-card"><img src="https://i.postimg.cc/zXbvW6F9/image-search-1762550234561.jpg" alt="Partner Logo 8"></div>
+      <div class="partner-logo-card"><img src="https://i.postimg.cc/YSsqhxmQ/image-search-1762553212895.jpg" alt="Partner Logo 9"></div>
+      <div class="partner-logo-card"><img src="https://i.postimg.cc/cHG1RLXy/logo-ar.png" alt="Partner Logo 10"></div>
+      <div class="partner-logo-card"><img src="https://i.postimg.cc/0NfXftCD/image-search-1762554440678.jpg" alt="Partner Logo 11"></div>
+      <div class="partner-logo-card"><img src="https://i.postimg.cc/xdThWD8s/image-search-1762554617453.jpg" alt="Partner Logo 12"></div>
+      <div class="partner-logo-card"><img src="https://i.postimg.cc/kgjfRVMN/image-search-1762554720505.png" alt="Partner Logo 13"></div>
+      <div class="partner-logo-card"><img src="https://i.postimg.cc/8PpRd10w/image-search-1762554838800.png" alt="Partner Logo 14"></div>
+      <div class="partner-logo-card"><img src="https://i.postimg.cc/SsNH80CD/download-2.jpg" alt="Partner Logo 15"></div>
+    </div>
+  </div>
+
+  <div id="iqama-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-xl shadow-2xl p-6 w-11/12 max-w-sm transform transition-all duration-300 scale-95 opacity-0" id="iqama-modal-content">
+            <h2 class="text-xl font-bold mb-4 border-b pb-2" style="color: var(--primary-color);">🗓️ ইকামার মেয়াদ সেট করুন</h2>
+            
+            <p class="text-sm text-gray-600 mb-4">আপনার ইকামার মেয়াদ শেষ হওয়ার তারিখটি **ইংরেজি (Gregorian)** ক্যালেন্ডার অনুযায়ী নির্ভুলভাবে লিখুন।</p>
+            
+            <div class="mb-4">
+                <label for="iqama-date-input" class="block text-sm font-medium text-gray-700 mb-1">শেষ হওয়ার তারিখ (YYYY-MM-DD):</label>
+                <input type="date" id="iqama-date-input" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-4" style="border-color: var(--secondary-color); color: var(--primary-color);">
+            </div>
+            
+            <div class="mb-6">
+                <label for="iqama-start-date-input" class="block text-sm font-medium text-gray-700 mb-1">মেয়াদ শুরুর তারিখ (ঐচ্ছিক, YYYY-MM-DD):</label>
+                <input type="date" id="iqama-start-date-input" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-4" style="border-color: var(--secondary-color); color: var(--primary-color);">
+                <p class="text-xs text-gray-400 mt-1">প্রোগ্রেস বার সঠিকভাবে দেখানোর জন্য প্রয়োজনীয়।</p>
+            </div>
+
+            <div class="flex justify-end space-x-3">
+                <button id="cancel-iqama-btn" class="px-4 py-2 text-sm font-semibold text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition">বাতিল</button>
+                <button id="save-iqama-btn" class="px-4 py-2 text-sm font-semibold text-white rounded-lg shadow-md transition" style="background-color: var(--secondary-color); hover:background-color: var(--dark-secondary);">সেভ করুন</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="visa-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-xl shadow-2xl p-6 w-11/12 max-w-sm transform transition-all duration-300 scale-95 opacity-0" id="visa-modal-content">
+            <h2 class="text-xl font-bold mb-4 border-b pb-2" style="color: var(--primary-color);">✈️ ছুটির মেয়াদ (Exit/Re-Entry) সেট করুন</h2>
+            
+            <p class="text-sm text-gray-600 mb-4 font-semibold">
+                আপনি যখন এয়ারপোর্ট থেকে বের হচ্ছেন, তখন আপনার ভিসায় কত দিনের ছুটি লেখা আছে তা নিচে দিন ও মাস অনুযায়ী লিখুন।
+            </p>
+            
+            <div class="mb-6 flex space-x-3 items-center">
+                <div class="flex-1">
+                    <label for="visa-duration-value" class="block text-sm font-medium text-gray-700 mb-1">ছুটির মোট সংখ্যা:</label>
+                    <input type="number" id="visa-duration-value" placeholder="যেমন: ৯০ / ৪" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-4" style="border-color: var(--secondary-color); color: var(--primary-color);">
+                </div>
+                <div class="w-24">
+                    <label for="visa-duration-unit" class="block text-sm font-medium text-gray-700 mb-1">একক:</label>
+                    <select id="visa-duration-unit" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-4 bg-white" style="border-color: var(--secondary-color); color: var(--primary-color);">
+                        <option value="day">দিন</option>
+                        <option value="month">মাস</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="flex justify-end space-x-3">
+                <button id="cancel-visa-btn" class="px-4 py-2 text-sm font-semibold text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition">বাতিল</button>
+                <button id="save-visa-duration-btn" class="px-4 py-2 text-sm font-semibold text-white rounded-lg shadow-md transition" style="background-color: var(--secondary-color); hover:background-color: var(--dark-secondary);">সেভ করুন</button>
+            </div>
+        </div>
+    </div>
+
+
+  <div class="bottom-nav">
+    <div class="d-flex justify-content-around">
+      <a href="#" onclick="openActivity('LiveActivity')" class="active"><i class="fas fa-home fa-lg"></i><div>হোম</div></a>
+      <a href="#" onclick="openActivity('ProbashiserviceActivity')"><i class="fas fa-tools fa-lg"></i><div>সেবা</div></a>
+      <a href="#" onclick="openActivity('ProbashiupdatenewsActivity')"><i class="fas fa-bolt fa-lg"></i><div>আপডেট</div></a>
+      <a href="#" onclick="openActivity('ProbashiupdatenewsActivity')" class="text-primary"><i class="fas fa-info-circle fa-lg"></i><div>তথ্য</div></a>
+    </div>
+  </div>
+
+  <script>
+    function openActivity(activityName) {
+      try {
+        // Sketchware WebView এর জন্য প্রথম মেথড
+        if (typeof Android !== 'undefined' && Android.openNewActivity) {
+          Android.openNewActivity(activityName);
+        } 
+        // যদি এটি ব্যর্থ হয়, তবে URL স্কিম ফলব্যাকে যান (Sketchware এর ডিফল্ট)
+        else {
+          window.location.href = "sketchware-app://open_activity?name=" + activityName;
+        }
+      } catch (error) {
+        console.error("Error communicating with Android Interface:", error);
+        // Fallback হিসেবে alert
+        alert("Activity খুলতে সমস্যা: " + activityName);
+      }
+    }
+    
+    // --- Modal Control Functions (Generic) ---
+    function showModal(modalId, contentId) {
+        const modal = document.getElementById(modalId);
+        const modalContent = document.getElementById(contentId);
+        
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        
+        setTimeout(() => {
+            modalContent.classList.remove('scale-95', 'opacity-0');
+            modalContent.classList.add('scale-100', 'opacity-100');
+        }, 50); 
+    }
+
+    function hideModal(modalId, contentId) {
+        const modal = document.getElementById(modalId);
+        const modalContent = document.getElementById(contentId);
+        
+        modalContent.classList.remove('scale-100', 'opacity-100');
+        modalContent.classList.add('scale-95', 'opacity-0');
+        
+        setTimeout(() => {
+            modal.classList.remove('flex');
+            modal.classList.add('hidden');
+        }, 300); 
+    }
+    
+    // --- Iqama Display Toggling ---
+    function toggleIqamaDisplay(showCard) {
+        const buttonContainer = document.getElementById('set-iqama-button-container');
+        const iqamaCard = document.getElementById('iqama-countdown-card');
+        
+        if (showCard) {
+            buttonContainer.classList.add('hidden');
+            iqamaCard.classList.remove('hidden');
+        } else {
+            buttonContainer.classList.remove('hidden');
+            iqamaCard.classList.add('hidden');
+        }
+    }
+
+    // --- Iqama Modal Specific Logic ---
+    function showIqamaModal() {
+        const expiryDateStr = localStorage.getItem('iqamaExpiryDate');
+        const startDateStr = localStorage.getItem('iqamaStartDate'); 
+        
+        if (expiryDateStr) {
+            document.getElementById('iqama-date-input').value = expiryDateStr;
+        } else {
+            document.getElementById('iqama-date-input').value = ''; 
+        }
+        
+        if (startDateStr) {
+            document.getElementById('iqama-start-date-input').value = startDateStr;
+        } else {
+            document.getElementById('iqama-start-date-input').value = ''; 
+        }
+        showModal('iqama-modal', 'iqama-modal-content');
+    }
+
+    function saveIqamaDate() {
+        const dateInput = document.getElementById('iqama-date-input').value;
+        const startDateInput = document.getElementById('iqama-start-date-input').value; 
+        const inputDate = new Date(dateInput);
+        
+        let isValid = true;
+        
+        if (!dateInput) {
+            alert("দয়া করে ইকামার মেয়াদ শেষ হওয়ার তারিখ লিখুন।");
+            isValid = false;
+            return; // ✅ Fix: Invalid input এ ফাংশন বন্ধ করতে হবে
+        }
+        
+        const today = new Date();
+        today.setHours(0, 0, 0, 0); 
+        inputDate.setHours(0, 0, 0, 0); 
+        
+        if (inputDate < today) {
+            alert("ভুল তারিখ: শেষের তারিখ ভবিষ্যতের হতে হবে।");
+            isValid = false;
+            return; // ✅ Fix: Invalid input এ ফাংশন বন্ধ করতে হবে
+        }
+        
+        let inputStartDate = null;
+        if (startDateInput) {
+            inputStartDate = new Date(startDateInput);
+            inputStartDate.setHours(0, 0, 0, 0); 
+            if (inputStartDate >= inputDate) {
+                alert("ভুল তারিখ: শুরুর তারিখ শেষের তারিখের আগের হতে হবে।");
+                isValid = false;
+                return; // ✅ Fix: Invalid input এ ফাংশন বন্ধ করতে হবে
+            }
+        }
+        
+        if (isValid) { 
+            localStorage.setItem('iqamaExpiryDate', dateInput);
+            
+            let finalStartDate = startDateInput;
+            if(!startDateInput) {
+                // যদি শুরুর তারিখ না দেওয়া হয়, তবে এক্সপায়ারি তারিখ থেকে ১ বছর পিছিয়ে ডিফল্ট শুরু ধরা হবে।
+                const impliedStart = new Date(inputDate);
+                impliedStart.setFullYear(inputDate.getFullYear() - 1);
+                // যদি ডিফল্ট শুরুর তারিখ বর্তমান তারিখের চেয়ে পুরোনো হয়, তবে ডিফল্ট তারিখটিই রাখা হবে।
+                if (impliedStart < today) {
+                    finalStartDate = impliedStart.toISOString().split('T')[0];
+                } else {
+                    // যদি ডিফল্ট শুরুর তারিখ বর্তমান তারিখের চেয়ে নতুন হয়, তবে বর্তমান তারিখই শুরু ধরা হবে।
+                    finalStartDate = today.toISOString().split('T')[0];
+                }
+            }
+            localStorage.setItem('iqamaStartDate', finalStartDate);
+            
+            hideModal('iqama-modal', 'iqama-modal-content');
+            setupIqamaCountdown(); 
+        }
+    }
+    
+    // --- Visa Display Toggling ---
+    function toggleVisaDisplay(showCard) {
+        const buttonContainer = document.getElementById('set-visa-button-container');
+        const visaCard = document.getElementById('visa-countdown-card');
+        
+        if (showCard) {
+            buttonContainer.classList.add('hidden');
+            visaCard.classList.remove('hidden');
+        } else {
+            buttonContainer.classList.remove('hidden');
+            visaCard.classList.add('hidden');
+        }
+    }
+
+    // --- Visa Modal Specific Logic ---
+    function showVisaModal() {
+        document.getElementById('visa-duration-value').value = ''; 
+        document.getElementById('visa-duration-unit').value = 'day';
+        showModal('visa-modal', 'visa-modal-content');
+    }
+
+    function saveVisaDuration() {
+        const durationValue = parseInt(document.getElementById('visa-duration-value').value);
+        const durationUnit = document.getElementById('visa-duration-unit').value; 
+        
+        if (isNaN(durationValue) || durationValue <= 0) {
+            alert("দয়া করে ছুটির মেয়াদ দিন বা মাস অনুযায়ী সঠিকভাবে লিখুন।");
+            return;
+        }
+
+        const startDate = new Date();
+        startDate.setHours(0, 0, 0, 0); 
+        
+        const expiryDate = new Date();
+        
+        // বর্তমান সময় বিবেচনায় এক্সপায়ারি ডেট সেট করা
+        if (durationUnit === 'day') {
+            expiryDate.setDate(startDate.getDate() + durationValue);
+        } else if (durationUnit === 'month') {
+            expiryDate.setMonth(startDate.getMonth() + durationValue);
+        }
+        
+        localStorage.setItem('visaExpiryDate', expiryDate.toISOString().split('T')[0]);
+        localStorage.setItem('visaStartDate', startDate.toISOString().split('T')[0]); 
+        
+        hideModal('visa-modal', 'visa-modal-content');
+        
+        toggleVisaDisplay(true);
+        setupVisaCountdown(); // ✅ Fix 2: এই ফাংশনটি এখন saveVisaDuration কল করার সাথে সাথে চলবে। 
+    }
+    
+    // --- Visa Reset/Delete Logic ---
+    function resetVisaTracker() {
+         if (confirm("আপনি কি নিশ্চিত যে ছুটির মেয়াদ ট্র্যাকারটি ডিলিট করতে চান? ডিলিট করলে কাউন্টডাউন বন্ধ হয়ে যাবে।")) {
+            localStorage.removeItem('visaExpiryDate');
+            localStorage.removeItem('visaStartDate');
+            if (visaCountdownInterval) clearInterval(visaCountdownInterval);
+            toggleVisaDisplay(false); 
+         }
+    }
+
+    // --- Iqama Reset/Delete Logic ---
+    function resetIqamaTracker() {
+         if (confirm("আপনি কি নিশ্চিত যে ইকামার মেয়াদ ট্র্যাকারটি ডিলিট করতে চান? ডিলিট করলে কাউন্টডাউন বন্ধ হয়ে যাবে।")) {
+            localStorage.removeItem('iqamaExpiryDate');
+            localStorage.removeItem('iqamaStartDate');
+            if (iqamaCountdownInterval) clearInterval(iqamaCountdownInterval);
+            toggleIqamaDisplay(false); 
+         }
+    }
+    
+    // --- গ্লোবাল ফাংশন: সময় ও টাইমজোন হ্যান্ডেলিং (AM/PM সহ আপডেট) ---
+    function getFormattedTime(timeZone, is24Hour) {
+        
+        const now = new Date(); 
+        
+        // 24 Hour Format (Used for UTC display)
+        if (is24Hour) {
+             const timeOptions24 = { 
+                hour: '2-digit', 
+                minute: '2-digit', 
+                timeZone: timeZone, 
+                hourCycle: 'h23'
+            };
+            const secOptions = { second: '2-digit', timeZone: timeZone };
+            
+            const timeFormatter24 = new Intl.DateTimeFormat('en-US', timeOptions24);
+            const secondsFormatter = new Intl.DateTimeFormat('en-US', secOptions);
+            
+            const formattedTime = timeFormatter24.format(now).replace(/\s[AP]M$/, '').trim();
+            const seconds = secondsFormatter.format(now);
+            
+            return { time: formattedTime, seconds: seconds, ampm: '' };
+
+        } else {
+             // 12 Hour Format with AM/PM (Used for Saudi & BD display)
+             const timeOptions12 = { 
+                hour: '2-digit', 
+                minute: '2-digit', 
+                timeZone: timeZone, 
+                hourCycle: 'h12'
+            };
+            const secOptions = { 
+                second: '2-digit', 
+                timeZone: timeZone 
+            };
+            const ampmOptions = {
+                hour: '2-digit',
+                timeZone: timeZone,
+                hourCycle: 'h12'
+            };
+
+            const timeFormatter12 = new Intl.DateTimeFormat('en-US', timeOptions12);
+            const secondsFormatter = new Intl.DateTimeFormat('en-US', secOptions);
+            const ampmFormatter = new Intl.DateTimeFormat('en-US', ampmOptions);
+            
+            // Time string with AM/PM
+            const fullTime = timeFormatter12.format(now);
+            const timePart = fullTime.replace(/\s[AP]M$/, '').trim();
+            
+            // Extract AM/PM
+            const ampmPart = fullTime.match(/([AP]M)$/i);
+            const ampm = ampmPart ? ampmPart[0].toUpperCase() : '';
+
+            const seconds = secondsFormatter.format(now);
+            
+            return { time: timePart, seconds: seconds, ampm: ampm };
+        }
+    }
+
+
+    function updateAllTimes() {
+        // সৌদি, বাংলাদেশ ও এয়ারপোর্ট টাইম ডেটা আনা হলো
+        const saudiData = getFormattedTime('Asia/Riyadh', false); // 12hr
+        const bdData = getFormattedTime('Asia/Dhaka', false); // 12hr
+        const airportData = getFormattedTime('Asia/Riyadh', true); // 24hr (সৌদি আরবের টাইমই ২৪ ঘন্টা ফরমেটে)
+        
+        // ঘড়ির টাইম ডিসপ্লেতে ডেটা ঢোকানো হলো
+        // এয়ারপোর্ট (মাঝের বার - 24hr)
+        document.getElementById('utc-time-24h-display').textContent = airportData.time;
+        document.getElementById('utc-sec-display').textContent = airportData.seconds ? `:${airportData.seconds}` : `:--`;
+
+        // সৌদি টাইম (12hr + AM/PM)
+        document.getElementById('saudi-time-display').textContent = saudiData.time;
+        document.getElementById('saudi-sec-display').textContent = saudiData.seconds ? `:${saudiData.seconds}` : `:--`;
+        document.getElementById('saudi-ampm-display').textContent = saudiData.ampm;
+        
+        // বাংলাদেশ টাইম (12hr + AM/PM)
+        document.getElementById('bd-time-display').textContent = bdData.time;
+        document.getElementById('bd-sec-display').textContent = bdData.seconds ? `:${bdData.seconds}` : `:--`;
+        document.getElementById('bd-ampm-display').textContent = bdData.ampm;
+    }
+    
+    // --- Iqama Countdown Logic ---
+    let iqamaCountdownInterval; 
+
+    function setupIqamaCountdown() {
+        if (iqamaCountdownInterval) clearInterval(iqamaCountdownInterval);
+        
+        const expiryDateStr = localStorage.getItem('iqamaExpiryDate');
+        const startDateStr = localStorage.getItem('iqamaStartDate'); 
+        
+        const elements = {
+            display: document.getElementById('iqama-countdown-display'),
+            card: document.getElementById('iqama-countdown-card'),
+            setBtn: document.getElementById('set-iqama-btn'),
+            progressContainer: document.getElementById('iqama-progress-container'),
+            progressBar: document.getElementById('iqama-progress-bar'),
+            statusDot: document.getElementById('iqama-status-dot'),
+            statusText: document.getElementById('iqama-status-text')
+        };
+
+        const borderClasses = ['border-red-500', 'border-yellow-500', 'border-green-500', 'border-gray-300'];
+        const dotClasses = ['bg-red-500', 'bg-yellow-500', 'bg-green-500', 'bg-gray-500'];
+        const statusClasses = ['text-red-600', 'text-yellow-600', 'text-green-700', 'text-gray-700'];
+        
+        elements.card.classList.remove(...borderClasses);
+        elements.statusDot.classList.remove(...dotClasses);
+        elements.statusText.classList.remove(...statusClasses);
+        
+        const dateOptions = { year: 'numeric', month: 'numeric', day: 'numeric' };
+        const formatDate = (date) => new Intl.DateTimeFormat('bn-BD', dateOptions).format(date);
+
+        if (!expiryDateStr || !startDateStr) {
+            toggleIqamaDisplay(false);
+            return;
+        }
+        
+        toggleIqamaDisplay(true);
+
+        const expiryDate = new Date(expiryDateStr);
+        const startDate = new Date(startDateStr);
+        const totalDuration = expiryDate.getTime() - startDate.getTime();
+
+        elements.setBtn.textContent = 'সেট করুন / ' + formatDate(expiryDate);
+        elements.progressContainer.classList.remove('hidden'); 
+
+        function updateCountdown() {
+            const now = new Date();
+            const remainingTime = expiryDate.getTime() - now.getTime();
+            
+            // Iqama Active State - Color matched with --secondary-color
+            let darkColor = getComputedStyle(document.documentElement).getPropertyValue('--dark-secondary'); 
+            let lightColor = getComputedStyle(document.documentElement).getPropertyValue('--secondary-color'); 
+            let shadowRgb = '10, 147, 150'; 
+            let statusTextContent = '✅ চলমান';
+            let cardBorderClass = 'border-green-500';
+            let statusDotClass = 'bg-green-500';
+            let statusClass = 'text-green-700';
+            let countdownClass = 'text-green-700';
+            
+            if (remainingTime <= 0) {
+                // Expired (Red)
+                darkColor = '#DC2626'; lightColor = '#FCA5A5'; shadowRgb = '220, 38, 38'; 
+                statusTextContent = '❌ মেয়াদ শেষ!';
+                cardBorderClass = 'border-red-500'; statusDotClass = 'bg-red-500'; 
+                statusClass = 'text-red-600'; countdownClass = 'text-red-700';
+                
+                elements.display.innerHTML = `<span class="compact-data ${countdownClass}">নবায়ন করুন</span>`;
+                if (elements.progressBar) elements.progressBar.style.width = `0%`;
+                
+                clearInterval(iqamaCountdownInterval); 
+            } else {
+                // Active Logic
+                elements.card.classList.remove(...borderClasses);
+                elements.statusDot.classList.remove(...dotClasses);
+                elements.statusText.classList.remove(...statusClasses);
+
+                const totalSeconds = Math.floor(remainingTime / 1000);
+                const days = Math.floor(totalSeconds / (3600 * 24));
+                const hours = Math.floor((totalSeconds % (3600 * 24)) / 3600);
+                const minutes = Math.floor((totalSeconds % 3600) / 60);
+                const seconds = totalSeconds % 60; 
+
+                const elapsedDuration = now.getTime() - startDate.getTime();
+                let remainingPercent = 100 - (elapsedDuration / totalDuration * 100);
+                
+                if (days < 90) { // 3 months warning (Yellow)
+                    darkColor = '#D97706'; lightColor = '#FBBF24'; shadowRgb = '217, 119, 6'; 
+                    statusTextContent = '⚠️ নবায়নের সময়';
+                    cardBorderClass = 'border-yellow-500'; statusDotClass = 'bg-yellow-500'; 
+                    statusClass = 'text-yellow-600'; countdownClass = 'text-yellow-700';
+                }
+                if (days < 30) { // 1 month critical (Red)
+                    darkColor = '#DC2626'; lightColor = '#FCA5A5'; shadowRgb = '220, 38, 38';
+                    statusTextContent = '🚨 জরুরি নবায়ন';
+                    cardBorderClass = 'border-red-500'; statusDotClass = 'bg-red-500';
+                    statusClass = 'text-red-600'; countdownClass = 'text-red-700';
+                }
+                
+                if (elements.progressBar) {
+                    // প্রগ্রেস বারের প্রস্থ এবং রং আপডেট করা
+                    elements.progressBar.style.width = `${remainingPercent.toFixed(2)}%`;
+                    elements.progressBar.style.setProperty('--progress-color-light', lightColor);
+                    elements.progressBar.style.setProperty('--progress-shadow-rgb', shadowRgb);
+                }
+                
+                // ⭐ COUNTDOWN/টাইম ফিক্স: !important ব্যবহার করে কালার কন্ট্রাস্ট বাড়ানো হলো
+                elements.display.innerHTML = `
+                    <span class="time-data ${countdownClass}" style="color: ${countdownClass.includes('red') ? '#dc2626' : '#15803d'} !important;">${days}</span><span class="time-label">দি.।</span>
+                    <span class="time-data ${countdownClass}" style="color: ${countdownClass.includes('red') ? '#dc2626' : '#15803d'} !important;">${hours}</span><span class="time-label">ঘ.।</span>
+                    <span class="time-data text-gray-500">${minutes}</span><span class="time-label text-gray-400">মি.।</span>
+                    <span class="time-data seconds">${seconds}</span><span class="time-label seconds">সে.</span>
+                    <span class="compact-baki-text">বাকি আছে</span>
+                `;
+            }
+            
+            elements.card.classList.add(cardBorderClass);
+            elements.statusDot.classList.add(statusDotClass);
+            elements.statusText.textContent = statusTextContent;
+            elements.statusText.classList.add(statusClass);
+        }
+        
+        updateCountdown(); 
+        iqamaCountdownInterval = setInterval(updateCountdown, 1000); 
+    }
+
+    // --- Visa Countdown Logic ---
+    let visaCountdownInterval; 
+
+    function setupVisaCountdown() {
+        if (visaCountdownInterval) clearInterval(visaCountdownInterval);
+        
+        const expiryDateStr = localStorage.getItem('visaExpiryDate');
+        const startDateStr = localStorage.getItem('visaStartDate'); 
+        
+        const elements = {
+            display: document.getElementById('visa-countdown-display'),
+            card: document.getElementById('visa-countdown-card'),
+            resetBtn: document.getElementById('reset-visa-btn'),
+            progressContainer: document.getElementById('visa-progress-container'),
+            progressBar: document.getElementById('visa-progress-bar'),
+            statusDot: document.getElementById('visa-status-dot'),
+            statusText: document.getElementById('visa-status-text')
+        };
+
+        const borderClasses = ['border-red-500', 'border-yellow-500', 'border-orange-500', 'border-gray-300'];
+        const dotClasses = ['bg-red-500', 'bg-yellow-500', 'bg-orange-500', 'bg-gray-500'];
+        const statusClasses = ['text-red-600', 'text-yellow-600', 'text-orange-700', 'text-gray-700'];
+        
+        elements.card.classList.remove(...borderClasses);
+        elements.statusDot.classList.remove(...dotClasses);
+        elements.statusText.classList.remove(...statusClasses);
+
+        const dateOptions = { year: 'numeric', month: 'numeric', day: 'numeric' };
+        const formatDate = (date) => new Intl.DateTimeFormat('bn-BD', dateOptions).format(date);
+
+        if (!expiryDateStr || !startDateStr) {
+            toggleVisaDisplay(false); 
+            return;
+        }
+        
+        toggleVisaDisplay(true); 
+
+        const expiryDate = new Date(expiryDateStr);
+        const startDate = new Date(startDateStr);
+        const totalDuration = expiryDate.getTime() - startDate.getTime();
+
+        elements.resetBtn.textContent = 'ডিলিট করুন / ' + formatDate(expiryDate);
+        elements.progressContainer.classList.remove('hidden'); 
+
+        function updateCountdown() {
+            const now = new Date();
+            const remainingTime = expiryDate.getTime() - now.getTime();
+            
+            // Visa Active State - Color matched with --accent-color
+            let darkColor = getComputedStyle(document.documentElement).getPropertyValue('--dark-accent'); 
+            let lightColor = getComputedStyle(document.documentElement).getPropertyValue('--accent-color'); 
+            let shadowRgb = '148, 210, 189'; 
+            let statusTextContent = '✅ চলমান';
+            let cardBorderClass = 'border-orange-500';
+            let statusDotClass = 'bg-orange-500';
+            let statusClass = 'text-orange-700';
+            let countdownClass = 'text-orange-700';
+            
+            if (remainingTime <= 0) {
+                // Expired (Red)
+                darkColor = '#DC2626'; lightColor = '#FCA5A5'; shadowRgb = '220, 38, 38'; 
+                statusTextContent = '❌ মেয়াদ শেষ!';
+                cardBorderClass = 'border-red-500'; statusDotClass = 'bg-red-500'; 
+                statusClass = 'text-red-600'; countdownClass = 'text-red-700';
+                
+                elements.display.innerHTML = `<span class="compact-data ${countdownClass}">জরুরি ব্যবস্থা নিন</span>`;
+                if (elements.progressBar) elements.progressBar.style.width = `0%`;
+                
+                clearInterval(visaCountdownInterval); 
+            } else {
+                // Active Logic
+                elements.card.classList.remove(...borderClasses);
+                elements.statusDot.classList.remove(...dotClasses);
+                elements.statusText.classList.remove(...statusClasses);
+
+                const totalSeconds = Math.floor(remainingTime / 1000);
+                const days = Math.floor(totalSeconds / (3600 * 24));
+                const hours = Math.floor((totalSeconds % (3600 * 24)) / 3600);
+                const minutes = Math.floor((totalSeconds % 3600) / 60);
+                const seconds = totalSeconds % 60; 
+
+                const elapsedDuration = now.getTime() - startDate.getTime();
+                let remainingPercent = 100 - (elapsedDuration / totalDuration * 100);
+                
+                if (days < 90) { // 3 months warning (Yellow)
+                    darkColor = '#D97706'; lightColor = '#FBBF24'; shadowRgb = '217, 119, 6'; 
+                    statusTextContent = '⚠️ নবায়নের সময়';
+                    cardBorderClass = 'border-yellow-500'; statusDotClass = 'bg-yellow-500'; 
+                    statusClass = 'text-yellow-600'; countdownClass = 'text-yellow-700';
+                }
+                if (days < 30) { // 1 month critical (Red)
+                    darkColor = '#DC2626'; lightColor = '#FCA5A5'; shadowRgb = '220, 38, 38';
+                    statusTextContent = '🚨 জরুরি ব্যবস্থা';
+                    cardBorderClass = 'border-red-500'; statusDotClass = 'bg-red-500';
+                    statusClass = 'text-red-600'; countdownClass = 'text-red-700';
+                }
+                
+                if (elements.progressBar) {
+                    // প্রগ্রেস বারের প্রস্থ এবং রং আপডেট করা
+                    elements.progressBar.style.width = `${remainingPercent.toFixed(2)}%`;
+                    elements.progressBar.style.setProperty('--progress-color-light', lightColor);
+                    elements.progressBar.style.setProperty('--progress-shadow-rgb', shadowRgb);
+                }
+                
+                // ⭐ COUNTDOWN/টাইম ফিক্স: !important ব্যবহার করে কালার কন্ট্রাস্ট বাড়ানো হলো
+                elements.display.innerHTML = `
+                    <span class="time-data ${countdownClass}" style="color: ${countdownClass.includes('red') ? '#dc2626' : '#c2410c'} !important;">${days}</span><span class="time-label">দি.।</span>
+                    <span class="time-data ${countdownClass}" style="color: ${countdownClass.includes('red') ? '#dc2626' : '#c2410c'} !important;">${hours}</span><span class="time-label">ঘ.।</span>
+                    <span class="time-data text-gray-500">${minutes}</span><span class="time-label text-gray-400">মি.।</span>
+                    <span class="time-data seconds">${seconds}</span><span class="time-label seconds">সে.</span>
+                    <span class="compact-baki-text">বাকি আছে</span>
+                `;
+            }
+            
+            elements.card.classList.add(cardBorderClass);
+            elements.statusDot.classList.add(statusDotClass);
+            elements.statusText.textContent = statusTextContent;
+            elements.statusText.classList.add(statusClass);
+        }
+        
+        updateCountdown(); 
+        visaCountdownInterval = setInterval(updateCountdown, 1000); 
+    }
+
+    // --- প্রাথমিক লোডিং ---
+    document.addEventListener('DOMContentLoaded', () => {
+        
+        // Iqama Buttons (✅ Fix 1: বাটন ক্লিক ইভেন্ট লিসেনার নিশ্চিত করা হয়েছে)
+        document.getElementById('show-iqama-modal-btn')?.addEventListener('click', showIqamaModal);
+        document.getElementById('set-iqama-btn')?.addEventListener('click', showIqamaModal);
+        document.getElementById('cancel-iqama-btn')?.addEventListener('click', () => hideModal('iqama-modal', 'iqama-modal-content'));
+        document.getElementById('save-iqama-btn')?.addEventListener('click', saveIqamaDate);
+        
+        // Visa Buttons
+        document.getElementById('show-visa-modal-btn')?.addEventListener('click', showVisaModal); 
+        document.getElementById('reset-visa-btn')?.addEventListener('click', resetVisaTracker); 
+        document.getElementById('cancel-visa-btn')?.addEventListener('click', () => hideModal('visa-modal', 'visa-modal-content'));
+        document.getElementById('save-visa-duration-btn')?.addEventListener('click', saveVisaDuration); // ✅ Fix 2: এই ফাংশনটি এখন saveVisaDuration কল করার সাথে সাথে চলবে।
+
+        // ⭐ সময় আপডেট লজিক শুরু (টাইম দেখানোর জন্য সবচেয়ে গুরুত্বপূর্ণ) ⭐
+        updateAllTimes();
+        setInterval(updateAllTimes, 1000); 
+
+        setupIqamaCountdown(); 
+        setupVisaCountdown(); 
+    });
+    
+  </script>
+
+</body>
+</html>
