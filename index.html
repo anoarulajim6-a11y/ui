@@ -421,7 +421,8 @@
     <main class="max-w-xl mx-auto p-0">
 
         <div id="set-iqama-button-container" class="mt-2.5">
-            <button id="show-iqama-modal-btn" class="thin-stylish-button">
+            <button id="show-iqama-modal-btn" class="thin-stylish-button" 
+                    onclick="showIqamaModal()"> 
                 🗓️ ইকামার মেয়াদ সেট করুন
             </button>
         </div>
@@ -430,7 +431,8 @@
             
             <div class="card-section-compact border-b border-gray-100 flex justify-between items-center">
                 <p class="compact-label text-gray-800 flex items-center">🗓️ ইকামার মেয়াদ শেষ</p>
-                <button id="set-iqama-btn" class="text-xs text-gray-500 font-semibold py-0.5 px-2 rounded-lg hover:bg-gray-100 transition duration-300 whitespace-nowrap">
+                <button id="set-iqama-btn" class="text-xs text-gray-500 font-semibold py-0.5 px-2 rounded-lg hover:bg-gray-100 transition duration-300 whitespace-nowrap"
+                        onclick="showIqamaModal()">
                     সেট করুন / --/--/----
                 </button>
             </div>
@@ -455,7 +457,8 @@
         </div>
         
         <div id="set-visa-button-container" class="mt-2.5">
-            <button id="show-visa-modal-btn" class="thin-stylish-button">
+            <button id="show-visa-modal-btn" class="thin-stylish-button"
+                    onclick="showVisaModal()">
                 ✈️ ছুটির মেয়াদ সেট করুন
             </button>
         </div>
@@ -464,7 +467,8 @@
             
             <div class="card-section-compact border-b border-gray-100 flex justify-between items-center">
                 <p class="compact-label text-gray-800 flex items-center">✈️ এক্সিট/রি-এন্ট্রি মেয়াদ</p>
-                <button id="reset-visa-btn" class="text-xs text-red-500 font-semibold py-0.5 px-2 rounded-lg hover:bg-red-50 transition duration-300 whitespace-nowrap">
+                <button id="reset-visa-btn" class="text-xs text-red-500 font-semibold py-0.5 px-2 rounded-lg hover:bg-red-50 transition duration-300 whitespace-nowrap"
+                        onclick="resetVisaTracker()">
                     ডিলিট করুন / --/--/----
                 </button>
             </div>
@@ -578,7 +582,11 @@
 
             <div class="flex justify-end space-x-3">
                 <button id="cancel-iqama-btn" class="px-4 py-2 text-sm font-semibold text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition">বাতিল</button>
-                <button id="save-iqama-btn" class="px-4 py-2 text-sm font-semibold text-white rounded-lg shadow-md transition" style="background-color: var(--secondary-color); hover:background-color: var(--dark-secondary);">সেভ করুন</button>
+                <button id="save-iqama-btn" 
+                        onclick="saveIqamaDate()"
+                        class="px-4 py-2 text-sm font-semibold text-white rounded-lg shadow-md transition" style="background-color: var(--secondary-color); hover:background-color: var(--dark-secondary);">
+                    সেভ করুন
+                </button>
             </div>
         </div>
     </div>
@@ -607,7 +615,11 @@
 
             <div class="flex justify-end space-x-3">
                 <button id="cancel-visa-btn" class="px-4 py-2 text-sm font-semibold text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition">বাতিল</button>
-                <button id="save-visa-duration-btn" class="px-4 py-2 text-sm font-semibold text-white rounded-lg shadow-md transition" style="background-color: var(--secondary-color); hover:background-color: var(--dark-secondary);">সেভ করুন</button>
+                <button id="save-visa-duration-btn" 
+                        onclick="saveVisaDuration()"
+                        class="px-4 py-2 text-sm font-semibold text-white rounded-lg shadow-md transition" style="background-color: var(--secondary-color); hover:background-color: var(--dark-secondary);">
+                    সেভ করুন
+                </button>
             </div>
         </div>
     </div>
@@ -710,7 +722,7 @@
         if (!dateInput) {
             alert("দয়া করে ইকামার মেয়াদ শেষ হওয়ার তারিখ লিখুন।");
             isValid = false;
-            return; // ✅ Fix: Invalid input এ ফাংশন বন্ধ করতে হবে
+            return; 
         }
         
         const today = new Date();
@@ -720,7 +732,7 @@
         if (inputDate < today) {
             alert("ভুল তারিখ: শেষের তারিখ ভবিষ্যতের হতে হবে।");
             isValid = false;
-            return; // ✅ Fix: Invalid input এ ফাংশন বন্ধ করতে হবে
+            return; 
         }
         
         let inputStartDate = null;
@@ -730,11 +742,12 @@
             if (inputStartDate >= inputDate) {
                 alert("ভুল তারিখ: শুরুর তারিখ শেষের তারিখের আগের হতে হবে।");
                 isValid = false;
-                return; // ✅ Fix: Invalid input এ ফাংশন বন্ধ করতে হবে
+                return; 
             }
         }
         
         if (isValid) { 
+            // ✅ স্থায়ীভাবে ডেটা সংরক্ষণ
             localStorage.setItem('iqamaExpiryDate', dateInput);
             
             let finalStartDate = startDateInput;
@@ -750,6 +763,7 @@
                     finalStartDate = today.toISOString().split('T')[0];
                 }
             }
+            // ✅ স্থায়ীভাবে ডেটা সংরক্ষণ
             localStorage.setItem('iqamaStartDate', finalStartDate);
             
             hideModal('iqama-modal', 'iqama-modal-content');
@@ -796,29 +810,71 @@
         if (durationUnit === 'day') {
             expiryDate.setDate(startDate.getDate() + durationValue);
         } else if (durationUnit === 'month') {
+            // মাস যোগ করলে দিনটি একই থাকার চেষ্টা করে, যা সঠিক ক্যালকুলেশনের জন্য ভালো।
             expiryDate.setMonth(startDate.getMonth() + durationValue);
         }
         
+        // ✅ স্থায়ীভাবে ডেটা সংরক্ষণ
         localStorage.setItem('visaExpiryDate', expiryDate.toISOString().split('T')[0]);
         localStorage.setItem('visaStartDate', startDate.toISOString().split('T')[0]); 
         
         hideModal('visa-modal', 'visa-modal-content');
         
         toggleVisaDisplay(true);
-        setupVisaCountdown(); // ✅ Fix 2: এই ফাংশনটি এখন saveVisaDuration কল করার সাথে সাথে চলবে। 
+        setupVisaCountdown(); 
     }
     
-    // --- Visa Reset/Delete Logic ---
+    // --- Visa Reset/Delete Logic (Sketchware ফিক্সড) ---
     function resetVisaTracker() {
-         if (confirm("আপনি কি নিশ্চিত যে ছুটির মেয়াদ ট্র্যাকারটি ডিলিট করতে চান? ডিলিট করলে কাউন্টডাউন বন্ধ হয়ে যাবে।")) {
+        const resetBtn = document.getElementById('reset-visa-btn');
+        
+        // প্রথম ক্লিক: নিশ্চিতকরণের জন্য বাটন পরিবর্তন হবে
+        if (!resetBtn.classList.contains('delete-confirm-state')) {
+            // বাটনকে নিশ্চিতকরণ অবস্থায় নিয়ে যাওয়া
+            resetBtn.textContent = '❌ নিশ্চিত? ডিলিট করুন!';
+            resetBtn.classList.add('delete-confirm-state');
+            // বর্তমান কালার ক্লাস রিমুভ ও নতুন কালার ক্লাস যোগ
+            resetBtn.classList.remove('text-red-500', 'hover:bg-red-50'); 
+            resetBtn.classList.add('bg-red-500', 'text-white', 'hover:bg-red-700'); 
+
+            // ৩ সেকেন্ড পরে নিশ্চিতকরণ স্ট্যাটাস রিমুভ করে দেওয়া
+            setTimeout(() => {
+                if (resetBtn.classList.contains('delete-confirm-state')) {
+                    resetBtn.classList.remove('delete-confirm-state', 'bg-red-500', 'text-white', 'hover:bg-red-700');
+                    
+                    // ডেটা রিলোড না করে শুধু টেক্সট পরিবর্তন
+                    const expiryDateStr = localStorage.getItem('visaExpiryDate');
+                    const dateOptions = { year: 'numeric', month: 'numeric', day: 'numeric' };
+                    const formatDate = (date) => new Intl.DateTimeFormat('bn-BD', dateOptions).format(date);
+                    resetBtn.textContent = 'ডিলিট করুন / ' + (expiryDateStr ? formatDate(new Date(expiryDateStr)) : '--/--/----');
+                    resetBtn.classList.add('text-red-500', 'hover:bg-red-50'); 
+                }
+            }, 3000);
+            
+            return; // প্রথম ক্লিকের পর ফাংশন শেষ
+        }
+
+        // দ্বিতীয় ক্লিক (নিশ্চিতকরণ): ডিলিট প্রক্রিয়া শুরু
+        if (resetBtn.classList.contains('delete-confirm-state')) {
+            // ডিলিট করার আগে interval বন্ধ করে দেওয়া
+            if (visaCountdownInterval) clearInterval(visaCountdownInterval);
+            
+            // ✅ স্থায়ীভাবে ডেটা ডিলিট
             localStorage.removeItem('visaExpiryDate');
             localStorage.removeItem('visaStartDate');
-            if (visaCountdownInterval) clearInterval(visaCountdownInterval);
+            
+            // ডিসপ্লে ও বাটন রিসেট
+            resetBtn.classList.remove('delete-confirm-state', 'bg-red-500', 'text-white', 'hover:bg-red-700');
+            
+            // কার্ড ডিসপ্লে বন্ধ করে দেওয়া এবং প্রাথমিক সেটিংসে ফিরিয়ে আনা
             toggleVisaDisplay(false); 
-         }
+            // পুনরায় inicial state সেট করা
+            setupVisaCountdown();
+        }
     }
 
-    // --- Iqama Reset/Delete Logic ---
+    
+    // --- Iqama Reset/Delete Logic (আগের মতো রাখা হলো) ---
     function resetIqamaTracker() {
          if (confirm("আপনি কি নিশ্চিত যে ইকামার মেয়াদ ট্র্যাকারটি ডিলিট করতে চান? ডিলিট করলে কাউন্টডাউন বন্ধ হয়ে যাবে।")) {
             localStorage.removeItem('iqamaExpiryDate');
@@ -1066,6 +1122,11 @@
 
         if (!expiryDateStr || !startDateStr) {
             toggleVisaDisplay(false); 
+            // ডিলিট করার পর বাটন টেক্সট ডিফল্ট রাখা
+            elements.resetBtn.textContent = 'ডিলিট করুন / --/--/----';
+            elements.resetBtn.classList.remove('bg-red-500', 'text-white', 'hover:bg-red-700');
+            elements.resetBtn.classList.add('text-red-500', 'hover:bg-red-50'); 
+            elements.resetBtn.classList.remove('delete-confirm-state');
             return;
         }
         
@@ -1092,6 +1153,9 @@
             let statusClass = 'text-orange-700';
             let countdownClass = 'text-orange-700';
             
+            // যদি বাটন নিশ্চিতকরণ অবস্থায় থাকে, তবে কাউন্টডাউনের রং হলুদ/লাল হবে না
+            const isConfirming = elements.resetBtn.classList.contains('delete-confirm-state');
+
             if (remainingTime <= 0) {
                 // Expired (Red)
                 darkColor = '#DC2626'; lightColor = '#FCA5A5'; shadowRgb = '220, 38, 38'; 
@@ -1118,13 +1182,13 @@
                 const elapsedDuration = now.getTime() - startDate.getTime();
                 let remainingPercent = 100 - (elapsedDuration / totalDuration * 100);
                 
-                if (days < 90) { // 3 months warning (Yellow)
+                if (days < 90 && !isConfirming) { // 3 months warning (Yellow)
                     darkColor = '#D97706'; lightColor = '#FBBF24'; shadowRgb = '217, 119, 6'; 
                     statusTextContent = '⚠️ নবায়নের সময়';
                     cardBorderClass = 'border-yellow-500'; statusDotClass = 'bg-yellow-500'; 
                     statusClass = 'text-yellow-600'; countdownClass = 'text-yellow-700';
                 }
-                if (days < 30) { // 1 month critical (Red)
+                if (days < 30 && !isConfirming) { // 1 month critical (Red)
                     darkColor = '#DC2626'; lightColor = '#FCA5A5'; shadowRgb = '220, 38, 38';
                     statusTextContent = '🚨 জরুরি ব্যবস্থা';
                     cardBorderClass = 'border-red-500'; statusDotClass = 'bg-red-500';
@@ -1148,10 +1212,13 @@
                 `;
             }
             
-            elements.card.classList.add(cardBorderClass);
-            elements.statusDot.classList.add(statusDotClass);
-            elements.statusText.textContent = statusTextContent;
-            elements.statusText.classList.add(statusClass);
+            // নিশ্চিতকরণ অবস্থায় থাকলে স্ট্যাটাস পরিবর্তন করা যাবে না
+            if (!isConfirming) {
+                elements.card.classList.add(cardBorderClass);
+                elements.statusDot.classList.add(statusDotClass);
+                elements.statusText.textContent = statusTextContent;
+                elements.statusText.classList.add(statusClass);
+            }
         }
         
         updateCountdown(); 
@@ -1161,22 +1228,15 @@
     // --- প্রাথমিক লোডিং ---
     document.addEventListener('DOMContentLoaded', () => {
         
-        // Iqama Buttons (✅ Fix 1: বাটন ক্লিক ইভেন্ট লিসেনার নিশ্চিত করা হয়েছে)
-        document.getElementById('show-iqama-modal-btn')?.addEventListener('click', showIqamaModal);
-        document.getElementById('set-iqama-btn')?.addEventListener('click', showIqamaModal);
+        // Modal cancel buttons (এগুলি ঠিক রাখা হয়েছে)
         document.getElementById('cancel-iqama-btn')?.addEventListener('click', () => hideModal('iqama-modal', 'iqama-modal-content'));
-        document.getElementById('save-iqama-btn')?.addEventListener('click', saveIqamaDate);
-        
-        // Visa Buttons
-        document.getElementById('show-visa-modal-btn')?.addEventListener('click', showVisaModal); 
-        document.getElementById('reset-visa-btn')?.addEventListener('click', resetVisaTracker); 
         document.getElementById('cancel-visa-btn')?.addEventListener('click', () => hideModal('visa-modal', 'visa-modal-content'));
-        document.getElementById('save-visa-duration-btn')?.addEventListener('click', saveVisaDuration); // ✅ Fix 2: এই ফাংশনটি এখন saveVisaDuration কল করার সাথে সাথে চলবে।
-
+        
         // ⭐ সময় আপডেট লজিক শুরু (টাইম দেখানোর জন্য সবচেয়ে গুরুত্বপূর্ণ) ⭐
         updateAllTimes();
         setInterval(updateAllTimes, 1000); 
 
+        // স্থায়ী ডেটা লোড করে কাউন্টডাউন শুরু
         setupIqamaCountdown(); 
         setupVisaCountdown(); 
     });
